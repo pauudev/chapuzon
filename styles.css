@@ -1,0 +1,930 @@
+/* =========================================================
+   Prepárate ante El Niño · estilos base
+   Paleta inspirada en la lluvia: azul tormenta, gris nube y
+   celeste agua. Amarillo y naranjo solo para alertas.
+   ========================================================= */
+:root {
+  /* Paleta suave: azul grisáceo de lluvia, más claro y menos contrastado */
+  --tormenta: #2a5464;      /* fondo principal */
+  --tormenta-2: #336272;    /* superficies */
+  --borde: #4a7a88;
+  --nube: #a3b7bf;
+  --agua: #66d3de;          /* acento */
+  --texto: #f4fafb;
+  --texto-suave: #d4e6eb;
+  --tarjeta: #f6fafb;       /* tarjetas claras de juego */
+  --tinta: #12303a;
+  --alerta: #f0a447;
+  --bien: #2e9e5b;
+  --mal: #d64541;
+  --mal-texto: #ffb4ae;     /* rojo claro para texto sobre fondo azul (contraste AA) */
+  --agua-texto: #a8edf3;    /* celeste claro para texto pequeño sobre fondo azul */
+  --fuente-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --fuente-texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; } /* lo oculto siempre queda oculto */
+html, body { margin: 0; }
+body {
+  background: linear-gradient(180deg, #2f5c6d 0%, #27505f 60%, #234957 100%) fixed;
+  background-color: var(--tormenta);
+  color: var(--texto);
+  font-family: var(--fuente-texto);
+  font-size: 18px;            /* letra mínima de 18 px */
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+h1, h2, h3 { font-family: var(--fuente-titulo); line-height: 1.1; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+
+/* Lluvia de fondo */
+#lluvia { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; }
+.barra, main, .aviso { position: relative; z-index: 1; }
+
+/* ---------- Barra superior ---------- */
+.barra {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 10px 20px;
+  background: rgba(42, 84, 100, 0.92);
+  border-bottom: 1px solid var(--borde);
+  backdrop-filter: blur(6px);
+}
+.marca { font-family: var(--fuente-titulo); font-weight: 800; color: var(--texto); text-decoration: none; font-size: 1.1rem; }
+.progreso { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; justify-content: center; }
+.progreso a {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  color: var(--texto-suave); text-decoration: none; font-weight: 600; font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+.progreso a span {
+  display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--tormenta-2); border: 1px solid var(--borde); font-size: 0.8rem;
+}
+.progreso a:hover { color: var(--texto); }
+.progreso a.actual { color: var(--texto); border-color: var(--agua); }
+.progreso a.actual span { background: var(--agua); color: var(--tinta); border-color: var(--agua); }
+.progreso a.completada span { background: var(--bien); border-color: var(--bien); color: #fff; }
+.puntaje { font-weight: 700; background: var(--tormenta-2); border: 1px solid var(--borde); padding: 6px 14px; border-radius: 12px; }
+.puntaje b { font-family: var(--fuente-titulo); color: var(--agua); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Pantallas (una visible a la vez) ---------- */
+main { flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 28px 20px 40px; }
+.pantalla { display: none; flex-direction: column; gap: 24px; scroll-margin-top: 200px; } /* al saltar con # se ve el título completo */
+.pantalla.activa { display: flex; }
+
+.etiqueta { font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--agua-texto); }
+
+/* Portada */
+.portada { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: center; }
+.portada-texto { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.portada h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; }
+.bajada { font-size: 1.2rem; color: var(--texto-suave); max-width: 52ch; }
+.portada-tadeo svg { width: 100%; max-width: 360px; height: auto; display: block; margin: 0 auto; }
+@media (max-width: 760px) { .portada { grid-template-columns: 1fr; } .portada-tadeo svg { max-width: 240px; } }
+
+.mapa-fases { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 860px) { .mapa-fases { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 420px) { .mapa-fases { grid-template-columns: 1fr; } }
+.tarjeta-fase {
+  display: flex; flex-direction: column; gap: 4px; height: 100%;
+  background: var(--tormenta-2); border: 1px solid var(--borde); border-radius: 16px; padding: 16px;
+  color: var(--texto); text-decoration: none; transition: border-color .15s, transform .15s;
+}
+.tarjeta-fase:hover { border-color: var(--agua); transform: translateY(-3px); }
+.tarjeta-fase .n { font-family: var(--fuente-titulo); font-weight: 800; font-size: 1.8rem; color: var(--agua); }
+.tarjeta-fase .cuando { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--alerta); }
+.tarjeta-fase strong { font-size: 1.1rem; }
+.tarjeta-fase span:last-child { color: var(--texto-suave); font-size: 0.95rem; }
+
+/* Fases */
+.cabecera-fase { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.cabecera-fase h1 { font-size: clamp(1.9rem, 4.5vw, 2.8rem); font-weight: 800; }
+.historia { font-size: 1.15rem; color: var(--texto-suave); max-width: 62ch; }
+.zona-juego {
+  min-height: 340px; background: rgba(51, 98, 114, 0.75); border: 1px solid var(--borde);
+  border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+}
+
+/* Resumen del cierre */
+.resumen-fases { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 760px) { .resumen-fases { grid-template-columns: repeat(2, 1fr); } }
+.resumen-fases li { background: var(--tormenta); border: 1px solid var(--borde); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.resumen-fases b { font-family: var(--fuente-titulo); font-size: 1.6rem; color: var(--agua); font-variant-numeric: tabular-nums; }
+
+/* Botones y navegación */
+.navegacion { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.boton {
+  display: inline-block; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+  background: var(--agua); color: var(--tinta); border: 2px solid var(--agua);
+  border-radius: 14px; padding: 12px 22px; min-height: 48px;   /* botones grandes */
+}
+.boton:hover { filter: brightness(1.1); }
+.boton-secundario { background: transparent; color: var(--texto); border-color: var(--nube); }
+.boton-grande { font-size: 1.2rem; padding: 14px 32px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--alerta); outline-offset: 3px; }
+
+/* Aviso al pie */
+.aviso {
+  text-align: center; padding: 16px 20px 24px; font-weight: 600;
+  background: rgba(240, 164, 71, 0.12); border-top: 2px solid var(--alerta); color: var(--texto);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.aviso span { font-weight: 400; font-size: 0.9rem; color: var(--texto-suave); }
+.creditos {
+  display: block; margin: 10px auto 0; padding-top: 10px; max-width: 86ch;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 400; font-size: 0.85rem; line-height: 1.6; color: var(--texto-suave);
+}
+.creditos b { color: var(--texto); font-weight: 700; }
+
+/* =========================================================
+   NUEVO: registro del apodo y ranking ficticio
+   ========================================================= */
+
+/* Apodo visible en la barra superior */
+.jugador {
+  font-weight: 700; background: var(--tormenta-2); border: 1px solid var(--borde);
+  padding: 6px 14px; border-radius: 12px; max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* Formulario de la portada */
+.registro {
+  display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 520px;
+  background: rgba(51, 98, 114, 0.75); border: 1px solid var(--borde); border-radius: 16px; padding: 16px;
+}
+.registro label { font-weight: 700; font-size: 1.05rem; }
+.registro-fila { display: flex; gap: 10px; flex-wrap: wrap; }
+.registro input {
+  flex: 1 1 200px; min-height: 48px; font: inherit; font-size: 1.1rem;
+  padding: 10px 14px; border-radius: 12px;
+  background: var(--tarjeta); color: var(--tinta); border: 2px solid var(--nube);
+}
+.registro input::placeholder { color: #5b6f7a; }
+.registro input:focus-visible { outline: 3px solid var(--alerta); outline-offset: 2px; border-color: var(--agua); }
+.registro input[aria-invalid="true"] { border-color: var(--mal); }
+.nota { font-size: 0.95rem; color: var(--texto-suave); }
+.mensaje-apodo { font-weight: 700; min-height: 1.5em; }
+.mensaje-apodo.ok { color: var(--agua); }
+.mensaje-apodo.error { color: var(--mal-texto); }
+
+/* Ranking del cierre */
+.ranking {
+  background: var(--tormenta); border: 1px solid var(--borde); border-radius: 16px; padding: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.ranking h2 { font-size: 1.4rem; }
+.lista-ranking { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lista-ranking li {
+  display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px;
+  background: var(--tormenta-2); border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px;
+}
+.lista-ranking .posicion {
+  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--borde); font-family: var(--fuente-titulo); font-weight: 800;
+}
+.lista-ranking .puntos { font-family: var(--fuente-titulo); font-weight: 800; font-variant-numeric: tabular-nums; color: var(--agua-texto); }
+/* La fila del jugador real se destaca con el color agua */
+.lista-ranking li.tu-fila { border: 2px solid var(--agua); background: rgba(102, 211, 222, 0.15); }
+.lista-ranking li.tu-fila .posicion { background: var(--agua); color: var(--tinta); }
+.lista-ranking li.fuera-top { border-style: dashed; }
+.mensaje-ranking { font-weight: 700; }
+
+/* =========================================================
+   FASE 1 · Arma tu mochila contrarreloj
+   ========================================================= */
+
+/* Texto solo para lectores de pantalla */
+.solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Panel superior: tiempo, inventario y barra */
+.f1-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.f1-tiempo {
+  display: flex; align-items: baseline; gap: 6px;
+  background: var(--tormenta); border: 2px solid var(--agua); border-radius: 14px; padding: 6px 16px; font-weight: 700;
+}
+.f1-tiempo b { font-family: var(--fuente-titulo); font-size: 2rem; color: var(--agua); font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
+.f1-tiempo.alerta { border-color: var(--alerta); }
+.f1-tiempo.alerta b { color: var(--alerta); }
+.f1-inventario { display: flex; flex-wrap: wrap; gap: 8px; }
+.f1-dato { background: var(--tormenta); border: 1px solid var(--borde); border-radius: 12px; padding: 8px 12px; font-weight: 700; }
+.f1-dato b { font-family: var(--fuente-titulo); font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.f1-dato.bien b { color: #5fd68f; }
+.f1-dato.mal b { color: var(--mal-texto); }
+.f1-barra { flex: 1 1 180px; height: 14px; background: var(--borde); border-radius: 999px; overflow: hidden; }
+.f1-barra span { display: block; height: 100%; width: 0; background: var(--agua); border-radius: 999px; transition: width .35s; }
+
+/* Zona de juego: Tadeo a la izquierda, objetos a la derecha */
+.f1-juego { display: grid; grid-template-columns: minmax(240px, 360px) 1fr; gap: 20px; align-items: start; }
+@media (max-width: 760px) { .f1-juego { grid-template-columns: 1fr; } .f1-tadeo svg { max-width: 220px; } }
+.f1-tadeo {
+  position: relative; background: var(--tormenta); border: 2px dashed transparent; border-radius: 18px;
+  padding: 8px; transition: border-color .2s, box-shadow .2s;
+}
+.f1-tadeo svg { width: 100%; height: auto; display: block; margin: 0 auto; }
+.f1-tadeo.encima { border-color: var(--agua); box-shadow: 0 0 0 6px rgba(102, 211, 222, 0.25); }
+.f1-pista {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: rgba(42, 84, 100, 0.9); border: 1px solid var(--borde); border-radius: 999px;
+  padding: 4px 12px; font-size: 0.9rem; font-weight: 700; white-space: nowrap;
+}
+.mochila { transform-box: fill-box; transform-origin: center bottom; }
+.mochila.saltar { animation: saltar .45s ease; }
+@keyframes saltar { 0% { transform: translateY(0); } 35% { transform: translateY(-10px); } 70% { transform: translateY(2px); } 100% { transform: translateY(0); } }
+
+.f1-objetos { display: flex; flex-direction: column; gap: 10px; }
+.f1-ayuda { color: var(--texto-suave); }
+.f1-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.f1-objeto {
+  position: relative; font: inherit; font-weight: 700; font-size: 1rem; line-height: 1.2; text-align: center;
+  background: var(--tarjeta); color: var(--tinta); border: 2px solid #d3dee3; border-radius: 14px;
+  padding: 10px 8px 12px; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  transition: transform .15s, border-color .15s, opacity .2s;
+}
+.f1-objeto svg { width: 54px; height: 54px; }
+/* En pantallas táctiles se puede bajar la página deslizando sobre los objetos (tocar = guardar) */
+@media (pointer: coarse) { .f1-objeto { touch-action: pan-y; } }
+.f1-objeto:hover:not(:disabled) { border-color: var(--agua); transform: translateY(-2px); }
+.f1-objeto:disabled { cursor: default; }
+.f1-objeto:disabled:not(.correcto):not(.incorrecto) { opacity: .55; }
+.f1-objeto.arrastrando { opacity: .35; }
+.f1-objeto.correcto { border-color: var(--bien); opacity: .6; }
+.f1-objeto.incorrecto { border-color: var(--mal); background: #fbe9e8; }
+.f1-marca {
+  position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; font-weight: 800; box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.correcto .f1-marca { background: var(--bien); }
+.incorrecto .f1-marca { background: var(--mal); }
+.sacudir { animation: sacudir .4s ease; }
+@keyframes sacudir { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+.f1-fantasma {
+  position: fixed; z-index: 50; pointer-events: none; width: 120px;
+  transform: translate(-50%, -50%) rotate(-4deg); box-shadow: 0 10px 24px rgba(0,0,0,.4);
+}
+
+/* Retroalimentación y resultado */
+.f1-retro { background: var(--tormenta); border-left: 5px solid var(--agua); border-radius: 0 12px 12px 0; padding: 12px 16px; }
+.f1-retro.bien { border-left-color: var(--bien); }
+.f1-retro.mal { border-left-color: var(--mal); }
+.f1-final {
+  background: var(--tarjeta); color: var(--tinta); border-radius: 16px; padding: 20px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.f1-final h3 { font-size: 1.6rem; }
+.f1-final h3:focus { outline: none; }
+.f1-acciones { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+.f1-final .boton-secundario { color: var(--tinta); border-color: var(--tinta); }
+
+/* =========================================================
+   FASE 2 · Salva a las mascotas
+   ========================================================= */
+.f2-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.f2-boton-pista { background: var(--alerta); border-color: var(--alerta); }
+.f2-escena { border-radius: 18px; overflow: hidden; border: 1px solid var(--borde); }
+.f2-escena svg { display: block; width: 100%; height: auto; }
+
+/* Zonas: invisibles hasta que se encuentran */
+.zona-casa { cursor: pointer; outline: none; }
+.zona-casa rect { fill: transparent; stroke: transparent; stroke-width: 4; transition: fill .2s, stroke .2s; }
+.zona-casa:hover rect { stroke: rgba(230, 243, 246, 0.35); stroke-dasharray: 8 6; }
+.zona-casa:focus-visible rect { stroke: var(--alerta); stroke-dasharray: 8 6; }
+.zona-casa.encontrada rect { stroke: var(--agua); stroke-dasharray: none; fill: rgba(102, 211, 222, 0.18); }
+.zona-casa.pista rect { stroke: var(--alerta); stroke-dasharray: none; animation: parpadeo .6s ease-in-out 5; }
+@keyframes parpadeo { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.1; } }
+
+/* Ambiente: lluvia, goteo y charco que crece */
+.lluvia-escena { animation: caer-escena .7s linear infinite; }
+@keyframes caer-escena { from { transform: translateY(-16px); } to { transform: translateY(16px); } }
+.goteo { animation: gotear 1s ease-in-out infinite; }
+@keyframes gotear { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+.charco-crece { transform-box: fill-box; transform-origin: center; animation: crecer 3s ease-in-out infinite; }
+@keyframes crecer { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.15); } }
+
+/* Mascotas asustadas: tiemblan */
+.mascota { transition: transform 1.5s ease-in-out; }
+.mascota .cara-feliz { display: none; }
+.canela, .michi { animation: temblar .25s linear infinite; }
+@keyframes temblar { 0%, 100% { translate: 0 0; } 25% { translate: -1px 0; } 75% { translate: 1px 0; } }
+
+/* Final: las mascotas entran a la casa y aparecen corazones */
+.a-salvo .canela, .a-salvo .michi { animation: none; }
+.a-salvo .canela { transform: translate(98px, -40px); }
+.a-salvo .michi { transform: translate(-72px, -48px); }
+.a-salvo .cara-susto { display: none; }
+.a-salvo .cara-feliz { display: inline; }
+.a-salvo .puerta { fill: #2a1a10; }
+.a-salvo .lluvia-escena { opacity: .25; }
+.corazones { opacity: 0; }
+.a-salvo .corazones { opacity: 1; animation: subir-corazones 1.6s ease-out infinite; }
+@keyframes subir-corazones { from { transform: translateY(10px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .a-salvo .corazones { opacity: 1; } }
+
+/* Mensajes y tarjetas "Cómo solucionarlo" */
+.f2-mensaje { font-weight: 700; min-height: 1.5em; }
+.f2-soluciones { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.f2-tarjeta {
+  background: var(--tarjeta); color: var(--tinta); border-left: 6px solid var(--agua);
+  border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;
+}
+.f2-tarjeta h4 { margin: 0; font-family: var(--fuente-titulo); font-size: 1.1rem; }
+.f2-protege { color: #2c4f5e; font-weight: 600; }
+
+/* =========================================================
+   FASE 3 · Ruta de evacuación
+   ========================================================= */
+.f3-panel { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; }
+.f3-ayuda { text-align: center; }
+
+/* Tablero + barra del nivel del agua */
+.f3-juego { display: flex; justify-content: center; align-items: stretch; gap: 14px; width: 100%; }
+.f3-tablero {
+  --hueco: 5px;
+  position: relative; width: min(100%, 560px, 66vh); min-width: 0; aspect-ratio: 1;
+  display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); gap: var(--hueco);
+  padding: 10px; border-radius: 22px; background: var(--tormenta);
+  border: 1px solid var(--borde); box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+.f3-tablero:focus-visible { box-shadow: 0 0 0 3px var(--alerta), inset 0 2px 12px rgba(0, 0, 0, 0.35); }
+
+/* Casillas: esquinas redondeadas y relieve suave */
+.f3-casilla {
+  position: relative; border-radius: 10px; overflow: hidden; cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+.f3-casilla svg { width: 78%; height: 78%; shape-rendering: geometricPrecision; position: relative; z-index: 1; }
+.tipo-C { background: #3f6876; }
+.tipo-H { background: #527d8b; }
+.tipo-Z { background: linear-gradient(160deg, #3f8a5a, #2a5f3d); }
+.tipo-I { background: linear-gradient(160deg, #2f7f95, #24607a); }
+.tipo-Q { background: linear-gradient(160deg, #7a5233, #5a3825); }
+.tipo-X { background: #3f6876; }
+.bandera { transform-box: fill-box; transform-origin: left center; animation: ondear 1.4s ease-in-out infinite; }
+@keyframes ondear { 0%, 100% { transform: skewY(0); } 50% { transform: skewY(-8deg) scaleX(.92); } }
+
+/* Casillas vecinas: se ven tocables */
+.f3-casilla.vecina { box-shadow: inset 0 0 0 2px rgba(102, 211, 222, 0.75); }
+.f3-casilla.vecina:hover { transform: scale(1.06); }
+
+/* Agua que sube: se llena desde abajo con una ola */
+.f3-casilla::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg, rgba(127, 208, 232, 0.9) 0 8%, rgba(29, 95, 168, 0.88) 22% 100%);
+  transform: scaleY(0); transform-origin: bottom;
+}
+.f3-casilla.agua-subio { cursor: not-allowed; }
+.f3-casilla.agua-subio::after { animation: llenar .6s ease-out var(--retraso, 0ms) forwards, oleaje 2.4s ease-in-out calc(var(--retraso, 0ms) + .6s) infinite; }
+@keyframes llenar { to { transform: scaleY(1); } }
+@keyframes oleaje { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.94); } }
+
+/* Ficha de Tadeo: se desliza de casilla en casilla */
+.f3-ficha {
+  --tam: calc((100% - 20px - 8 * var(--hueco)) / 9);
+  position: absolute; z-index: 5; pointer-events: none;
+  width: var(--tam); height: var(--tam);
+  left: calc(10px + var(--col, 0) * (var(--tam) + var(--hueco)));
+  top: calc(10px + var(--fila, 8) * (var(--tam) + var(--hueco)));
+  display: grid; place-items: center;
+  transition: left .22s cubic-bezier(.2, .8, .2, 1), top .22s cubic-bezier(.2, .8, .2, 1);
+}
+.f3-ficha svg { width: 86%; height: 86%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)); }
+.f3-ficha.choque svg { animation: sacudir .4s ease; }
+.a-salvo .f3-ficha svg { animation: festejar .6s ease-in-out 3; }
+@keyframes festejar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18%); } }
+
+/* Barra vertical del nivel del agua */
+.f3-nivel { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.f3-nivel-titulo { font-size: 0.85rem; font-weight: 700; color: var(--texto-suave); }
+.f3-nivel-tubo {
+  position: relative; flex: 1; width: 26px; border-radius: 999px; overflow: hidden;
+  background: var(--tormenta); border: 2px solid var(--borde);
+}
+.f3-nivel-agua {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 0;
+  background: linear-gradient(180deg, #7fd0e8, #1d5fa8); border-radius: 999px 999px 0 0;
+  transition: height .6s ease-out;
+}
+
+/* Botones de flecha en pantalla (cruz) */
+.f3-controles {
+  display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(2, 60px); gap: 8px;
+  justify-content: center; grid-template-areas: ". arriba ." "izquierda abajo derecha";
+}
+.f3-control {
+  display: grid; place-items: center; border-radius: 16px; cursor: pointer;
+  background: var(--tormenta-2); color: var(--texto); border: 2px solid var(--agua);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3); transition: transform .1s ease, background .15s ease;
+}
+.f3-control svg { width: 28px; height: 28px; }
+.f3-control:hover { background: var(--agua); color: var(--tinta); }
+.f3-control:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3); }
+.f3-control:disabled { opacity: .4; cursor: default; }
+.f3-control.arriba { grid-area: arriba; }
+.f3-control.abajo { grid-area: abajo; }
+.f3-control.izquierda { grid-area: izquierda; }
+.f3-control.derecha { grid-area: derecha; }
+
+/* Mensajes */
+.f3-mensaje {
+  align-self: center; text-align: center; max-width: 60ch; font-weight: 700;
+  background: var(--tormenta); border: 1px solid var(--borde); border-radius: 16px; padding: 10px 18px;
+}
+.f3-mensaje.mal { border-color: var(--mal); }
+.f3-mensaje.bien { border-color: var(--bien); }
+
+/* Leyenda */
+.f3-leyenda { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; font-size: 0.95rem; color: var(--texto-suave); }
+.f3-leyenda li { display: flex; align-items: center; gap: 6px; }
+.f3-mini { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; }
+.f3-mini svg { width: 80%; height: 80%; }
+.f3-mini.agua-subio { background: linear-gradient(180deg, #7fd0e8 0 15%, #1d5fa8 40% 100%); }
+
+/* Resultado */
+#f3-final { text-align: center; align-items: center; }
+#f3-final .f1-acciones { justify-content: center; }
+.f3-detalle { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+
+@media (max-width: 520px) {
+  /* Datos en una grilla de 2 x 2 para no ocupar tanto alto */
+  .f3-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  .f3-panel > * { display: block; padding: 6px 8px; font-size: 0.95rem; text-align: center; }
+  .f3-panel .f1-tiempo { display: flex; justify-content: center; align-items: baseline; gap: 4px; }
+  .f3-panel .f1-tiempo b { font-size: 1.4rem; }
+  .f3-tablero { width: 100%; --hueco: 3px; padding: 6px; border-radius: 16px; }
+  .f3-ficha { --tam: calc((100% - 12px - 8 * var(--hueco)) / 9); left: calc(6px + var(--col, 0) * (var(--tam) + var(--hueco))); top: calc(6px + var(--fila, 8) * (var(--tam) + var(--hueco))); }
+  .f3-casilla { border-radius: 7px; }
+  .f3-nivel-tubo { width: 16px; }
+  .f3-juego { gap: 8px; }
+  .f3-controles { grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(2, 64px); }
+}
+
+/* =========================================================
+   FASE 4 · Volver seguro
+   ========================================================= */
+.f4-escena { border-radius: 18px; overflow: hidden; border: 1px solid var(--borde); }
+.f4-escena svg { display: block; width: 100%; height: clamp(150px, 24vh, 240px); } /* recorta el cielo para que la tarjeta quede a la vista */
+.sol { animation: brillar 3s ease-in-out infinite; }
+@keyframes brillar { 0%, 100% { opacity: .85; } 50% { opacity: 1; } }
+.f4-ayuda { text-align: center; }
+.txt-bien { color: #5fd68f; }
+.txt-mal { color: var(--mal-texto); }
+
+/* Puntos de progreso */
+.f4-puntos { list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; gap: 8px; }
+.f4-puntos li { width: 14px; height: 14px; border-radius: 50%; background: var(--borde); transition: background .3s; }
+.f4-puntos li.bien { background: var(--bien); }
+.f4-puntos li.mal { background: var(--mal); }
+
+/* Mazo de tarjetas apiladas */
+.f4-mazo { position: relative; width: min(100%, 420px); height: 250px; margin: 6px auto 0; }
+.f4-tarjeta {
+  --pila: 0;
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 26px 24px; text-align: center;
+  background: var(--tarjeta); color: var(--tinta); border-radius: 22px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  transform: translateY(calc(var(--pila) * 12px)) scale(calc(1 - var(--pila) * 0.05));
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1), opacity .35s ease;
+  user-select: none; -webkit-user-select: none;
+  overflow: hidden;
+}
+/* Las tarjetas de atrás se ven como una pila, sin mostrar su texto */
+.f4-tarjeta:not(.arriba) { background: #cfdde3; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3); }
+.f4-tarjeta:not(.arriba) > * { visibility: hidden; }
+.f4-tarjeta.arriba { cursor: grab; touch-action: pan-y; } /* desliza a los lados sin bloquear el scroll vertical */
+.f4-tarjeta.arrastrando { cursor: grabbing; transition: none; }
+.f4-tarjeta.volando { transition: transform .45s ease-in, opacity .45s ease-in; opacity: 0; }
+.f4-pregunta { font-size: 0.85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #4d6370; }
+.f4-accion { font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(1.3rem, 3.5vw, 1.7rem); line-height: 1.2; text-wrap: balance; }
+.f4-pista { font-size: 0.9rem; color: #4d6370; font-weight: 600; }
+
+/* Sellos que aparecen al arrastrar */
+.f4-sello {
+  position: absolute; top: 18px; padding: 4px 12px; border: 3px solid; border-radius: 10px;
+  font-family: var(--fuente-titulo); font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
+  pointer-events: none;
+}
+.sello-bien { right: 18px; color: var(--bien); border-color: var(--bien); transform: rotate(10deg); opacity: var(--sello-bien, 0); }
+.sello-mal { left: 18px; color: var(--mal); border-color: var(--mal); transform: rotate(-10deg); opacity: var(--sello-mal, 0); }
+.f4-vacio { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-family: var(--fuente-titulo); font-size: 1.3rem; font-weight: 800; padding: 20px; }
+
+/* Botones Peligroso / Seguro */
+.f4-botones { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+.f4-boton {
+  display: flex; align-items: center; gap: 8px; min-width: 160px; min-height: 56px; justify-content: center;
+  font: inherit; font-weight: 800; font-size: 1.1rem; border-radius: 999px; cursor: pointer;
+  border: 3px solid; background: var(--tormenta); transition: background .15s, color .15s, transform .1s;
+}
+.f4-boton svg { width: 24px; height: 24px; }
+.f4-boton.peligroso { color: var(--mal-texto); border-color: var(--mal); }
+.f4-boton.seguro { color: #5fd68f; border-color: var(--bien); }
+.f4-boton.peligroso:hover:not(:disabled) { background: var(--mal); color: #fff; }
+.f4-boton.seguro:hover:not(:disabled) { background: var(--bien); color: #fff; }
+.f4-boton:active:not(:disabled) { transform: scale(.97); }
+.f4-boton:disabled { opacity: .4; cursor: default; }
+
+/* Retroalimentación */
+.f4-retro {
+  width: min(100%, 560px); align-self: center; text-align: center;
+  background: var(--tarjeta); color: var(--tinta); border-radius: 16px; padding: 18px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; border-top: 6px solid var(--agua);
+  animation: aparecer .35s ease-out;
+}
+.f4-retro.bien { border-top-color: var(--bien); }
+.f4-retro.mal { border-top-color: var(--mal); }
+.f4-retro strong { font-family: var(--fuente-titulo); font-size: 1.25rem; }
+.f4-retro-accion { font-weight: 700; color: #2c4f5e; }
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Resultado */
+#f4-final { text-align: center; align-items: center; }
+#f4-final .f1-acciones { justify-content: center; }
+.f4-repaso { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+@media (max-width: 520px) {
+  .f4-mazo { height: 230px; }
+  .f4-boton { min-width: 0; flex: 1; }
+}
+
+/* =========================================================
+   CIERRE · Puntaje, insignias y retroalimentación
+   ========================================================= */
+.cierre-total {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  background: linear-gradient(135deg, rgba(102, 211, 222, 0.16), rgba(245, 215, 110, 0.12));
+  border: 1px solid var(--borde); border-radius: 20px; padding: 22px 26px; overflow: hidden;
+}
+.cierre-texto { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.cierre-numero { font-family: var(--fuente-titulo); font-weight: 800; line-height: 1; }
+.cierre-numero b { font-size: clamp(3rem, 9vw, 4.6rem); color: var(--agua); font-variant-numeric: tabular-nums; }
+.cierre-numero span { font-size: 1.4rem; color: var(--texto-suave); }
+.cierre-mensaje { font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(1.3rem, 3.4vw, 1.8rem); text-wrap: balance; }
+.cierre-barra { height: 14px; max-width: 420px; background: var(--borde); border-radius: 999px; overflow: hidden; margin-top: 4px; }
+.cierre-barra span { display: block; height: 100%; width: var(--avance); background: linear-gradient(90deg, var(--agua), #f5d76e); border-radius: 999px; animation: llenar-barra 1.2s ease-out; }
+@keyframes llenar-barra { from { width: 0; } }
+
+/* El sol sale cuando para la lluvia */
+.sol-cierre { width: clamp(96px, 16vw, 150px); height: auto; flex: none; }
+.sol-cierre.salir { animation: sol-sale 1.6s cubic-bezier(.2, .8, .2, 1) both; }
+.sol-cierre .rayos { transform-origin: 60px 60px; animation: girar 14s linear infinite; }
+@keyframes sol-sale { from { opacity: 0; transform: translateY(60px) scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* Insignias */
+.insignias-zona { display: flex; flex-direction: column; gap: 12px; }
+.insignias-zona h2, .conclusion h3 { font-size: 1.4rem; }
+.insignias { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 760px) { .insignias { grid-template-columns: repeat(2, 1fr); } }
+.insignia {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  background: var(--tormenta); border: 1px solid var(--borde); border-radius: 18px; padding: 16px 10px;
+}
+.insignia svg { width: min(110px, 80%); height: auto; }
+.insignia strong { font-family: var(--fuente-titulo); font-size: 1.05rem; line-height: 1.2; }
+.insignia span { font-size: 0.9rem; color: var(--texto-suave); }
+.insignia.ganada { border-color: rgba(245, 215, 110, 0.55); }
+.insignia.ganada span { color: #f5d76e; font-weight: 700; }
+.insignia.ganada svg { animation: medalla .8s cubic-bezier(.2, .8, .2, 1.4) var(--retraso, 0ms) both; filter: drop-shadow(0 6px 14px rgba(245, 215, 110, 0.35)); }
+@keyframes medalla { 0% { opacity: 0; transform: scale(.3) rotate(-25deg); } 70% { opacity: 1; transform: scale(1.12) rotate(6deg); } 100% { transform: scale(1) rotate(0); } }
+.insignia.pendiente svg { filter: grayscale(1); opacity: .35; }
+.insignia.pendiente strong { color: var(--texto-suave); }
+
+/* Conclusión */
+.conclusion {
+  background: var(--tarjeta); color: var(--tinta); border-radius: 18px; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.conclusion .nota { color: #4d6370; }
+.conclusion-bien, .conclusion-repasar { padding-left: 14px; border-left: 5px solid; }
+.conclusion-bien { border-color: var(--bien); }
+.conclusion-repasar { border-color: var(--alerta); }
+
+/* Botones finales centrados */
+#cierre .navegacion { justify-content: center; }
+
+@media (max-width: 520px) {
+  .cierre-total { flex-direction: column-reverse; text-align: center; padding: 18px; }
+  .cierre-texto { align-items: center; }
+  .cierre-barra { width: 100%; }
+}
+
+/* =========================================================
+   NUEVO: flechas laterales, transición entre fases y responsive
+   ========================================================= */
+
+/* Flechas: círculos a los costados que se abren mostrando el nombre de la fase */
+.flecha {
+  position: fixed; top: 50%; z-index: 20;
+  display: flex; align-items: center; gap: 0;
+  height: 60px; min-width: 60px; padding: 0 14px;
+  border-radius: 999px; border: 2px solid var(--agua);
+  background: rgba(51, 98, 114, 0.94); color: var(--texto); text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transform: translateY(-50%);
+  transition: gap .3s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.flecha-anterior { left: 16px; }
+.flecha-siguiente { right: 16px; flex-direction: row-reverse; }
+.flecha svg { width: 28px; height: 28px; flex: none; transition: transform .2s ease; }
+.flecha-texto {
+  display: flex; flex-direction: column; line-height: 1.15;
+  max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width .35s ease;
+}
+.flecha-siguiente .flecha-texto { text-align: right; }
+.flecha-texto small { font-size: 0.75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-suave); }
+.flecha-texto b { font-size: 1rem; }
+.flecha:hover, .flecha:focus-visible { background: var(--agua); color: var(--tinta); gap: 10px; }
+.flecha:hover .flecha-texto, .flecha:focus-visible .flecha-texto { max-width: 240px; }
+.flecha:hover small, .flecha:focus-visible small { color: var(--tinta); }
+.flecha-anterior:hover svg { transform: translateX(-3px); }
+.flecha-siguiente:hover svg { transform: translateX(3px); }
+/* Pulso cuando la fase actual está completa */
+.flecha.llamar { animation: llamar 1.8s ease-in-out infinite; }
+@keyframes llamar { 0%, 100% { box-shadow: 0 0 0 0 rgba(102, 211, 222, 0.55); } 50% { box-shadow: 0 0 0 14px rgba(102, 211, 222, 0); } }
+
+/* En pantallas anchas, el contenido deja espacio a las flechas */
+@media (min-width: 900px) {
+  main { max-width: 1296px; padding-left: 88px; padding-right: 88px; }
+}
+
+/* Transición: la pantalla entra deslizándose y una ola de agua la cruza */
+.pantalla.entra-derecha { animation: entrar-derecha .55s cubic-bezier(.2, .8, .2, 1); }
+.pantalla.entra-izquierda { animation: entrar-izquierda .55s cubic-bezier(.2, .8, .2, 1); }
+@keyframes entrar-derecha { from { opacity: 0; transform: translateX(48px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes entrar-izquierda { from { opacity: 0; transform: translateX(-48px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+
+.ola-transicion {
+  position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(102, 211, 222, 0.28) 40%, rgba(102, 211, 222, 0.4) 50%, rgba(102, 211, 222, 0.28) 60%, transparent 100%);
+}
+.ola-transicion.ola-avanza { animation: ola-avanza .7s ease-out; }
+.ola-transicion.ola-vuelve { animation: ola-vuelve .7s ease-out; }
+@keyframes ola-avanza { 0% { opacity: 1; transform: translateX(100%); } 100% { opacity: 1; transform: translateX(-100%); } }
+@keyframes ola-vuelve { 0% { opacity: 1; transform: translateX(-100%); } 100% { opacity: 1; transform: translateX(100%); } }
+
+/* Fase 2: textos breves centrados y tarjetas al ancho de la escena */
+#juego-fase-2 .f1-ayuda, .f2-mensaje { text-align: center; }
+.f2-panel { justify-content: center; }
+.f2-mensaje:not(:empty) {
+  align-self: center; background: var(--tormenta); border: 1px solid var(--borde);
+  border-radius: 999px; padding: 8px 18px;
+}
+.f2-soluciones { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.f2-tarjeta { border-left: none; border-top: 6px solid var(--agua); }
+.f2-tarjeta h4 { text-align: center; }
+#f2-final { text-align: center; align-items: center; }
+#f2-final .f1-acciones { justify-content: center; }
+
+/* ---------- Celulares y tablets ---------- */
+@media (max-width: 899px) {
+  /* Las flechas bajan a las esquinas inferiores y muestran su texto */
+  .flecha { top: auto; bottom: 14px; transform: none; height: 54px; min-width: 54px; padding: 0 12px; gap: 8px; }
+  .flecha-texto { max-width: 130px; }
+  .flecha-texto b { font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; }
+  .flecha:hover, .flecha:focus-visible { gap: 8px; }
+  .flecha:hover .flecha-texto, .flecha:focus-visible .flecha-texto { max-width: 130px; }
+  main { padding: 20px 14px 96px; }
+  .aviso { padding-bottom: 88px; }
+  .zona-juego { padding: 14px; border-radius: 16px; }
+}
+
+@media (max-width: 899px) {
+  /* Barra superior compacta: marca y puntaje arriba, fases en una fila deslizable */
+  .barra { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; padding: 8px 12px; }
+  .progreso { grid-column: 1 / -1; grid-row: 2; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+  .progreso::-webkit-scrollbar { display: none; }
+  .progreso a { flex: 0 0 auto; padding: 4px 10px; }
+  .jugador { max-width: 130px; padding: 4px 10px; font-size: 0.9rem; }
+  .puntaje { padding: 4px 10px; }
+}
+
+@media (max-width: 700px) {
+  .portada h1 { font-size: 2.3rem; }
+  .flecha-texto small { display: none; }
+}
+
+@media (max-width: 420px) {
+  .flecha-texto { max-width: 96px; }
+  .f1-grilla { grid-template-columns: repeat(2, 1fr); }
+  .f1-tiempo b { font-size: 1.6rem; }
+}
+
+/* =========================================================
+   NUEVO: bloqueo de fases y sacudida
+   ========================================================= */
+
+/* La pantalla "se resiste": sacudida que se va apagando */
+.pantalla.sacudida { animation: sacudida .55s cubic-bezier(.36, .07, .19, .97); }
+@keyframes sacudida {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(5px); }
+  30%, 50%, 70% { transform: translateX(-10px); }
+  40%, 60% { transform: translateX(10px); }
+}
+/* El área de juego se marca en naranjo mientras se sacude */
+.pantalla.sacudida .zona-juego,
+.pantalla.sacudida .registro { animation: borde-alerta .9s ease-out; }
+@keyframes borde-alerta {
+  0%, 40% { box-shadow: 0 0 0 3px var(--alerta), 0 0 24px rgba(240, 164, 71, 0.45); }
+  100% { box-shadow: 0 0 0 0 rgba(240, 164, 71, 0); }
+}
+
+/* Aviso con candado arriba al centro */
+.aviso-bloqueo {
+  position: fixed; top: 84px; left: 50%; z-index: 40;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--alerta); color: var(--tinta); font-weight: 700;
+  padding: 12px 20px; border-radius: 999px; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  transform: translateX(-50%);
+}
+.aviso-bloqueo svg { width: 22px; height: 22px; flex: none; }
+.aviso-bloqueo.mostrar { animation: aviso-entra .35s cubic-bezier(.2, .8, .2, 1); }
+@keyframes aviso-entra { from { opacity: 0; transform: translate(-50%, -14px) scale(.96); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+@media (max-width: 899px) { .aviso-bloqueo { top: 104px; width: max-content; max-width: calc(100% - 28px); } }
+
+/* Candado para enlaces bloqueados */
+.bloqueada { cursor: not-allowed; }
+.progreso a.bloqueada, .tarjeta-fase.bloqueada { position: relative; }
+.progreso a.bloqueada { opacity: .5; }
+.tarjeta-fase.bloqueada { opacity: .55; }
+.tarjeta-fase.bloqueada:hover { transform: none; border-color: var(--borde); }
+.progreso a.bloqueada::after,
+.tarjeta-fase.bloqueada::after,
+.flecha.bloqueada::after {
+  content: ""; width: 16px; height: 16px; flex: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='5' y='11' width='14' height='10' rx='2' fill='%23b9d3db'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3' fill='none' stroke='%23b9d3db' stroke-width='2.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.tarjeta-fase.bloqueada::after { position: absolute; top: 14px; right: 14px; width: 20px; height: 20px; }
+/* Flecha bloqueada: apagada, con un candado pequeño */
+.flecha.bloqueada { border-color: var(--nube); color: var(--texto-suave); box-shadow: none; }
+.flecha.bloqueada:hover, .flecha.bloqueada:focus-visible { background: rgba(51, 98, 114, 0.94); color: var(--texto-suave); }
+.flecha.bloqueada:hover small { color: var(--texto-suave); }
+.flecha.bloqueada::after {
+  position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%;
+  background-color: var(--tormenta); background-size: 14px; border: 2px solid var(--nube);
+}
+
+/* Etiqueta del modo desarrollo (se quita al poner MODO_DESARROLLO = false) */
+.etiqueta-desarrollo {
+  position: fixed; left: 12px; bottom: 12px; z-index: 25;
+  background: var(--alerta); color: var(--tinta); font-size: 0.8rem; font-weight: 800;
+  padding: 4px 10px; border-radius: 8px; opacity: .9; pointer-events: none;
+}
+@media (max-width: 899px) { .etiqueta-desarrollo { bottom: auto; top: 96px; } }
+
+/* =========================================================
+   NUEVO: encabezados con efecto por fase e indicador de progreso
+   ========================================================= */
+.cabecera-fase {
+  position: relative; isolation: isolate; overflow: hidden;
+  padding: 26px 18px 22px; border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+/* Brillo de color propio de cada fase */
+.cabecera-fase::before {
+  content: ""; position: absolute; inset: -20%; z-index: -2;
+  background: radial-gradient(ellipse at 50% 30%, var(--tono, rgba(102, 211, 222, 0.4)) 0%, transparent 62%);
+  animation: respirar 7s ease-in-out infinite;
+}
+@keyframes respirar { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
+/* Dibujo suave y transparente que se mueve (nubes, gotas, olas, rayos, estrellas) */
+.cabecera-fase::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: .22; pointer-events: none;
+  background-image: var(--motivo); background-size: var(--motivo-tam, 160px 80px);
+  animation: var(--motivo-anim, none);
+}
+.cabecera-fase .historia { color: var(--texto); opacity: .92; }
+
+/* Fase 1 · Antes: nubes que se acercan */
+#fase-1 .cabecera-fase {
+  --tono: rgba(160, 220, 235, 0.45);
+  --motivo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='80'%3E%3Cg fill='white'%3E%3Cellipse cx='40' cy='30' rx='30' ry='12'/%3E%3Cellipse cx='60' cy='24' rx='20' ry='12'/%3E%3Cellipse cx='120' cy='62' rx='22' ry='8'/%3E%3C/g%3E%3C/svg%3E");
+  --motivo-anim: nubes-pasan 26s linear infinite;
+}
+@keyframes nubes-pasan { to { background-position: 160px 0; } }
+
+/* Fase 2 · Alerta: llovizna y tono de alerta */
+#fase-2 .cabecera-fase {
+  --tono: rgba(240, 164, 71, 0.38);
+  --motivo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M10 4l-3 10M30 22l-3 10' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  --motivo-tam: 40px 40px;
+  --motivo-anim: llovizna 1.1s linear infinite;
+}
+@keyframes llovizna { to { background-position: -12px 40px; } }
+
+/* Fase 3 · Durante: olas que avanzan */
+#fase-3 .cabecera-fase {
+  --tono: rgba(110, 150, 230, 0.45);
+  --motivo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='24'%3E%3Cpath d='M0 12q10-10 20 0t20 0 20 0 20 0' fill='none' stroke='white' stroke-width='2.5'/%3E%3C/svg%3E");
+  --motivo-tam: 80px 24px;
+  --motivo-anim: olas-avanzan 3s linear infinite;
+}
+@keyframes olas-avanzan { to { background-position: 80px 0; } }
+
+/* Fase 4 · Después: rayos de sol que vuelven */
+#fase-4 .cabecera-fase {
+  --tono: rgba(245, 215, 110, 0.42);
+  --motivo: repeating-conic-gradient(from 0deg at 50% -30%, rgba(255, 255, 255, 0.9) 0deg 5deg, transparent 5deg 16deg);
+  --motivo-tam: 100% 100%;
+  --motivo-anim: rayos-suaves 9s ease-in-out infinite;
+}
+@keyframes rayos-suaves { 0%, 100% { opacity: .14; } 50% { opacity: .28; } }
+
+/* Calificaciones: estrellas que brillan */
+#cierre .cabecera-fase {
+  --tono: rgba(95, 214, 143, 0.4);
+  --motivo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='70'%3E%3Cg fill='white'%3E%3Cpath d='M20 10l2 6 6 2-6 2-2 6-2-6-6-2 6-2z'/%3E%3Cpath d='M66 40l1.5 4.5 4.5 1.5-4.5 1.5-1.5 4.5-1.5-4.5-4.5-1.5 4.5-1.5z'/%3E%3Ccircle cx='50' cy='14' r='2'/%3E%3Ccircle cx='14' cy='52' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  --motivo-tam: 90px 70px;
+  --motivo-anim: destellos 2.6s ease-in-out infinite;
+}
+@keyframes destellos { 0%, 100% { opacity: .14; } 50% { opacity: .32; } }
+
+/* Indicador de fases centrado bajo el título */
+.indicador-fases {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px;
+}
+.indicador-fases li {
+  display: flex; align-items: center; gap: 6px; padding: 4px 12px 4px 4px;
+  border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--texto-suave);
+  background: rgba(255, 255, 255, 0.06); border: 1px solid transparent;
+  transition: background .3s, color .3s, border-color .3s;
+}
+.indicador-fases li + li::before {
+  content: ""; width: 14px; height: 2px; margin-left: -12px; margin-right: 2px;
+  background: rgba(255, 255, 255, 0.25); border-radius: 2px;
+}
+.indicador-fases .punto {
+  display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  font-size: 0.78rem; font-weight: 800; background: rgba(255, 255, 255, 0.14);
+}
+.indicador-fases li.hecha .punto { background: var(--bien); color: #fff; }
+.indicador-fases li.actual { color: var(--tinta); background: var(--agua); border-color: var(--agua); box-shadow: 0 4px 14px rgba(102, 211, 222, 0.35); }
+.indicador-fases li.actual .punto { background: var(--tinta); color: var(--agua); }
+/* En celulares solo se ve el nombre del paso actual */
+@media (max-width: 600px) {
+  .indicador-fases li { padding: 4px; }
+  .indicador-fases li .nombre { display: none; }
+  .indicador-fases li.actual { padding-right: 12px; }
+  .indicador-fases li.actual .nombre { display: inline; }
+}
+
+/* =========================================================
+   NUEVO: portada con el nombre "Chapuzón" destacado
+   ========================================================= */
+.titulo-juego { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; line-height: 1; }
+.titulo-texto {
+  font-size: clamp(3.4rem, 10vw, 6.2rem); font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(100deg, #ffffff 0%, #bff1f5 35%, var(--agua) 60%, #ffffff 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 6px 18px rgba(102, 211, 222, 0.35));
+  animation: brillo-agua 6s ease-in-out infinite;
+}
+@keyframes brillo-agua { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.titulo-ola { width: 100%; height: 16px; color: var(--agua); opacity: .9; animation: ola-titulo 3s ease-in-out infinite; }
+@keyframes ola-titulo { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
+.lema {
+  font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(1.3rem, 3.2vw, 1.9rem);
+  line-height: 1.2; color: var(--texto); text-wrap: balance; max-width: 26ch;
+}
+@media (max-width: 760px) {
+  .portada-texto { align-items: center; text-align: center; }
+  .titulo-juego { align-items: center; }
+}
+
+/* =========================================================
+   NUEVO: fases de la barra superior con color de énfasis
+   ========================================================= */
+.progreso a {
+  background: rgba(102, 211, 222, 0.12); border-color: rgba(102, 211, 222, 0.35); color: #c9f2f6;
+}
+.progreso a span { background: rgba(102, 211, 222, 0.28); border-color: transparent; color: #eafcfd; }
+.progreso a:hover { background: rgba(102, 211, 222, 0.22); color: #ffffff; }
+.progreso a.actual { background: var(--agua); border-color: var(--agua); color: var(--tinta); box-shadow: 0 4px 14px rgba(102, 211, 222, 0.4); }
+.progreso a.actual span { background: var(--tinta); color: var(--agua); }
+.progreso a.completada span { background: var(--bien); color: #fff; }
+
+/* Animaciones de Tadeo */
+.tadeo-flota { animation: flotar 3.2s ease-in-out infinite; }
+@keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.nube { animation: deriva 16s linear infinite; }
+.nube.lenta { animation-duration: 24s; animation-delay: -9s; }
+@keyframes deriva { from { transform: translateX(-120px); } to { transform: translateX(420px); } }
+
+/* Respeta a quienes prefieren menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapuzón: Prepárate ante El Niño y los cambios climáticos</title>
+  <meta name="description" content="Juego educativo para aprender a prepararse y actuar ante lluvias intensas, inundaciones y aluviones en Chile.">
+  <meta name="theme-color" content="#2a5464">
+  <!-- Ícono de la pestaña: una gota de agua dibujada en SVG -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3C16 3 6 14.5 6 20.5a10 10 0 0 0 20 0C26 14.5 16 3 16 3z' fill='%2366d3de'/%3E%3Cpath d='M11.5 21a4.5 4.5 0 0 0 4.5 4.5' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Lluvia animada de fondo (decorativa) -->
+  <canvas id="lluvia" aria-hidden="true"></canvas>
+
+  <!-- Barra superior: progreso y puntaje -->
+  <header class="barra">
+    <a class="marca" href="#portada">Chapuzón</a>
+    <nav class="progreso" aria-label="Fases del juego">
+      <a href="#fase-1" data-fase="1"><span>1</span> Antes</a>
+      <a href="#fase-2" data-fase="2"><span>2</span> Alerta</a>
+      <a href="#fase-3" data-fase="3"><span>3</span> Durante</a>
+      <a href="#fase-4" data-fase="4"><span>4</span> Después</a>
+      <a href="#cierre" data-fase="5"><span>★</span> Calificaciones</a>
+    </nav>
+    <!-- NUEVO: apodo del jugador (se completa desde script.js) -->
+    <div class="jugador" id="jugador-barra" hidden></div>
+    <div class="puntaje" aria-live="polite">Puntaje: <b id="puntaje-total">0</b></div>
+  </header>
+
+  <main>
+    <!-- PORTADA -->
+    <section class="pantalla" id="portada" aria-labelledby="t-portada">
+      <div class="portada">
+        <div class="portada-texto">
+          <span class="etiqueta">Juego educativo · Chile 2026</span>
+          <!-- NUEVO: el nombre del juego es el protagonista de la portada -->
+          <h1 id="t-portada" class="titulo-juego">
+            <span class="titulo-texto">Chapuzón</span>
+            <svg class="titulo-ola" viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12q18-12 37.5 0t37.5 0 37.5 0 37.5 0 37.5 0 37.5 0 37.5 0 37.5 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
+          </h1>
+          <p class="lema">Prepárate ante El Niño y los cambios climáticos</p>
+          <p class="bajada">El Niño trae lluvias intensas, inundaciones y aluviones. Acompaña a Tadeo y su familia durante un temporal y aprende qué hacer antes, durante y después.</p>
+
+          <!-- NUEVO: registro del apodo del jugador para el ranking -->
+          <form class="registro" id="form-registro" novalidate>
+            <label for="apodo">Escribe tu apodo de jugador</label>
+            <div class="registro-fila">
+              <input type="text" id="apodo" name="apodo" maxlength="15" autocomplete="off" placeholder="Ej: Gota Veloz" aria-describedby="nota-apodo mensaje-apodo">
+              <button type="submit" class="boton">Guardar y comenzar</button>
+            </div>
+            <p class="nota" id="nota-apodo">Escribe tu apodo para empezar.</p>
+            <p class="mensaje-apodo" id="mensaje-apodo" aria-live="polite"></p>
+          </form>
+
+          <!-- Aparece cuando el jugador ya registró su apodo -->
+          <a class="boton boton-grande" id="boton-continuar" href="#fase-1" hidden>Continuar jugando</a>
+        </div>
+        <div class="portada-tadeo" id="tadeo-portada" aria-hidden="true"></div>
+      </div>
+
+      <ol class="mapa-fases">
+        <li><a class="tarjeta-fase" href="#fase-1"><span class="n">1</span><span class="cuando">Antes</span><strong>Arma tu mochila</strong><span>Contrarreloj</span></a></li>
+        <li><a class="tarjeta-fase" href="#fase-2"><span class="n">2</span><span class="cuando">Alerta</span><strong>Salva a las mascotas</strong><span>Encuentra los peligros</span></a></li>
+        <li><a class="tarjeta-fase" href="#fase-3"><span class="n">3</span><span class="cuando">Durante</span><strong>Ruta de evacuación</strong><span>Llega a la zona alta</span></a></li>
+        <li><a class="tarjeta-fase" href="#fase-4"><span class="n">4</span><span class="cuando">Después</span><strong>Volver seguro</strong><span>¿Seguro o peligroso?</span></a></li>
+      </ol>
+    </section>
+
+    <!-- FASE 1 -->
+    <section class="pantalla" id="fase-1" aria-labelledby="t-fase-1">
+      <header class="cabecera-fase">
+        <h1 id="t-fase-1">Arma tu mochila contrarreloj</h1>
+        <p class="historia">Se anuncia un temporal. Tadeo tiene 60 segundos para preparar su mochila de emergencia.</p>
+      </header>
+      <div class="zona-juego" id="juego-fase-1">
+        <!-- El minijuego de la Fase 1 se dibuja aquí desde iniciarFase1() en script.js -->
+      </div>
+    </section>
+
+    <!-- FASE 2 -->
+    <section class="pantalla" id="fase-2" aria-labelledby="t-fase-2">
+      <header class="cabecera-fase">
+        <h1 id="t-fase-2">Salva a las mascotas</h1>
+        <p class="historia">La lluvia comenzó y la casa es un caos. Encuentra los peligros para proteger a Canela y Michi.</p>
+      </header>
+      <div class="zona-juego" id="juego-fase-2">
+        <!-- El minijuego de la Fase 2 se dibuja aquí desde iniciarFase2() en script.js -->
+      </div>
+    </section>
+
+    <!-- FASE 3 -->
+    <section class="pantalla" id="fase-3" aria-labelledby="t-fase-3">
+      <header class="cabecera-fase">
+        <h1 id="t-fase-3">Ruta de evacuación</h1>
+        <p class="historia">Hay que evacuar. Guía a Tadeo hasta la zona alta antes de que suba el agua.</p>
+      </header>
+      <div class="zona-juego" id="juego-fase-3">
+        <!-- El minijuego de la Fase 3 se dibuja aquí desde iniciarFase3() en script.js -->
+      </div>
+    </section>
+
+    <!-- FASE 4 -->
+    <section class="pantalla" id="fase-4" aria-labelledby="t-fase-4">
+      <header class="cabecera-fase">
+        <h1 id="t-fase-4">Volver seguro</h1>
+        <p class="historia">La lluvia paró y la familia vuelve a casa. ¿Qué es seguro hacer y qué es peligroso?</p>
+      </header>
+      <div class="zona-juego" id="juego-fase-4">
+        <!-- El minijuego de la Fase 4 se dibuja aquí desde iniciarFase4() en script.js -->
+      </div>
+    </section>
+
+    <!-- CALIFICACIONES (cierre) -->
+    <section class="pantalla" id="cierre" aria-labelledby="t-cierre">
+      <header class="cabecera-fase">
+        <h1 id="t-cierre">Tu resultado</h1>
+        <p class="historia" id="historia-cierre">La familia de Tadeo está a salvo. Revisa cómo te fue en cada fase.</p>
+      </header>
+      <div class="zona-juego" id="juego-cierre">
+        <!-- NUEVO: puntaje total, mensaje y sol que aparece -->
+        <div class="cierre-total" id="cierre-total"></div>
+
+        <ul class="resumen-fases" id="resumen-fases"></ul>
+
+        <!-- NUEVO: insignias por fase -->
+        <section class="insignias-zona" aria-labelledby="t-insignias">
+          <h2 id="t-insignias">Tus insignias</h2>
+          <ul class="insignias" id="insignias"></ul>
+        </section>
+
+        <!-- NUEVO: conclusión de retroalimentación -->
+        <section class="conclusion" id="conclusion" aria-labelledby="t-conclusion"></section>
+
+        <!-- NUEVO: ranking ficticio Top 5 -->
+        <section class="ranking" aria-labelledby="t-ranking">
+          <h2 id="t-ranking">Top 5 de jugadores</h2>
+          <ol class="lista-ranking" id="lista-ranking"></ol>
+          <p class="mensaje-ranking" id="mensaje-ranking" aria-live="polite"></p>
+          <p class="nota">Ranking de práctica: los otros jugadores son personajes ficticios.</p>
+        </section>
+
+      </div>
+      <nav class="navegacion">
+        <a class="boton boton-secundario" href="#portada">Volver a la portada</a>
+        <button class="boton" type="button" id="reiniciar">Jugar de nuevo</button>
+      </nav>
+    </section>
+  </main>
+
+  <!-- NUEVO: flechas para ir a la fase anterior y siguiente (se actualizan desde script.js) -->
+  <a class="flecha flecha-anterior" id="flecha-anterior" href="#portada" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="flecha-texto"><small>Anterior</small><b id="flecha-anterior-nombre"></b></span>
+  </a>
+  <a class="flecha flecha-siguiente" id="flecha-siguiente" href="#fase-1">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="flecha-texto"><small>Siguiente</small><b id="flecha-siguiente-nombre"></b></span>
+  </a>
+
+  <!-- NUEVO: aviso cuando el jugador intenta saltarse una fase -->
+  <div class="aviso-bloqueo" id="aviso-bloqueo" role="status" aria-live="assertive" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>
+    <span id="aviso-bloqueo-texto"></span>
+  </div>
+
+  <!-- NUEVO: ola de agua que cruza la pantalla al cambiar de fase -->
+  <div class="ola-transicion" id="ola-transicion" aria-hidden="true"></div>
+
+  <footer class="aviso">
+    Actividad educativa. Ante una emergencia sigue las indicaciones de SENAPRED y las autoridades.
+    <span>Desarrollado con apoyo de IA generativa de código.</span>
+    <!-- NUEVO: créditos del proyecto (copyright ficticio, uso académico) -->
+    <small class="creditos">
+      © 2026 Chapuzón · Mariangel Colina, Wilson Verdugo y Alexandra Rodríguez.<br>
+      Proyecto académico del curso <b>Alfabetización en IA: del prompt al proyecto</b> (26-4B-BBD) · IPLACEX<br>
+      Profesor: Luis Fabián Farías Oñate · Uso educativo, sin fines comerciales.
+    </small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
